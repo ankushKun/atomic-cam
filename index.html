@@ -3,31 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Scanner</title>
+    <title>Atomic Cam</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
     <link rel="stylesheet" href="css/styles.css">
     <!-- Dynamsoft Document Normalizer SDK -->
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.js"></script>
+    <!-- ArConnect SDK -->
+    <script src="https://unpkg.com/arconnect"></script>
     <!-- App Scripts -->
+    <script src="js/wallet.js"></script>
     <script src="js/config.js"></script>
     <script src="js/scanner.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Document Scanner</h1>
+        <h1>Atomic Cam</h1>
         
-        <div class="controls">
-            <button id="start-detecting" class="btn" style="display: none">Start Scanning</button>
-            <button id="restart-detecting" class="btn" style="display: none">Restart</button>
-            <button id="normalize-with-confirmed-quad" class="btn" disabled>Normalize</button>
-        </div>
-
         <div class="viewer-container">
-            <div id="camera-container"></div>
-            <div id="editor-container"></div>
-            <div id="result-container"></div>
+            <div class="controls">
+                <button id="wallet-connect" class="btn btn-wallet">
+                    <span>Connect Wallet</span>
+                </button>
+                <button id="start-detecting" class="btn">
+                    <span>Start Scanning</span>
+                </button>
+                <button id="restart-detecting" class="btn hidden">
+                    <span>Restart</span>
+                </button>
+                <button id="normalize-with-confirmed-quad" class="btn hidden">
+                    <span>Next</span>
+                </button>
+            </div>
+
+            <div id="camera-container" class="hidden"></div>
+            <div id="editor-container" class="hidden"></div>
+            <div id="result-container" class="hidden"></div>
         </div>
 
-        <div id="status-message"></div>
+        <div id="status-message" class="hidden"></div>
     </div>
 </body>
 </html> 

@@ -1,3 +1,5 @@
+let walletManager;
+
 class DocumentScanner {
     constructor() {
         this.router = null;
@@ -20,7 +22,24 @@ class DocumentScanner {
             statusMessage: document.getElementById('status-message')
         };
 
+        // Add show/hide utility methods
+        this.showElement = this.showElement.bind(this);
+        this.hideElement = this.hideElement.bind(this);
+
         this.initialize();
+    }
+
+    showElement(element) {
+        element.classList.remove('hidden');
+        element.classList.add('fade-in');
+    }
+
+    hideElement(element) {
+        element.classList.add('fade-out');
+        setTimeout(() => {
+            element.classList.add('hidden');
+            element.classList.remove('fade-out');
+        }, 300);
     }
 
     async initialize() {
@@ -40,7 +59,11 @@ class DocumentScanner {
             // Automatically start scanning
             await this.startDetecting();
             
-            this.updateStatus('Scanner started. Point camera at a document.');
+            // Show only necessary elements at start
+            this.showElement(this.elements.startBtn);
+            this.showElement(this.elements.statusMessage);
+            
+            this.updateStatus('Scanner ready. Click Start Scanning to begin.');
         } catch (error) {
             this.updateStatus(`Initialization failed: ${error.message}`);
             console.error(error);
@@ -85,11 +108,12 @@ class DocumentScanner {
             this.updateStatus('Opening camera...');
             await this.cameraEnhancer.open();
             
+            this.hideElement(this.elements.startBtn);
+            this.showElement(this.elements.cameraContainer);
+            this.showElement(this.elements.restartBtn);
+            
             this.updateStatus('Starting detection...');
             await this.router.startCapturing("DetectDocumentBoundaries_Default");
-            
-            this.elements.startBtn.style.display = 'none';
-            this.elements.restartBtn.style.display = 'inline';
         } catch (error) {
             this.updateStatus(`Failed to start detection: ${error.message}`);
             console.error(error);
@@ -120,22 +144,28 @@ class DocumentScanner {
         this.frameCount = 0;
         await this.router.stopCapturing();
         
-        this.elements.cameraContainer.style.display = 'none';
-        this.elements.editorContainer.style.display = 'block';
+        // Hide camera container with fade
+        this.hideElement(this.elements.cameraContainer);
         
-        this.imageEditorView.setOriginalImage(this.originalImageData);
-        
-        this.quads = [];
-        for (const item of result.items) {
-            if (item.type === Dynamsoft.Core.EnumCapturedResultItemType.CRIT_ORIGINAL_IMAGE) continue;
+        // Show editor after camera fade
+        setTimeout(() => {
+            this.showElement(this.elements.editorContainer);
+            this.showElement(this.elements.normalizeBtn);
             
-            const quad = new Dynamsoft.DCE.QuadDrawingItem({ points: item.location.points });
-            this.quads.push(quad);
-        }
-        
-        this.layer.addDrawingItems(this.quads);
-        this.elements.normalizeBtn.disabled = false;
-        this.updateStatus('Document detected. Adjust corners if needed, then click "Normalize".');
+            this.imageEditorView.setOriginalImage(this.originalImageData);
+            
+            this.quads = [];
+            for (const item of result.items) {
+                if (item.type === Dynamsoft.Core.EnumCapturedResultItemType.CRIT_ORIGINAL_IMAGE) continue;
+                
+                const quad = new Dynamsoft.DCE.QuadDrawingItem({ points: item.location.points });
+                this.quads.push(quad);
+            }
+            
+            this.layer.addDrawingItems(this.quads);
+            
+            this.updateStatus('Document detected. Adjust corners if needed, then click "Next".');
+        }, 300);
     }
 
     async normalizeDocument() {
@@ -145,7 +175,10 @@ class DocumentScanner {
                 selectedItems[0].getQuad() : 
                 this.items[1].location;
 
-            this.elements.editorContainer.style.display = 'none';
+            this.hideElement(this.elements.editorContainer);
+            this.hideElement(this.elements.normalizeBtn);
+            this.showElement(this.elements.resultContainer);
+
             this.elements.resultContainer.innerHTML = '';
 
             const settings = await this.router.getSimplifiedSettings("NormalizeDocument_Default");
@@ -157,12 +190,27 @@ class DocumentScanner {
             
             if (normalizeResult.items[0]) {
                 const canvas = normalizeResult.items[0].toCanvas();
+                canvas.style.maxWidth = '100%';
+                canvas.style.height = 'auto';
+                canvas.style.borderRadius = '8px';
+                canvas.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                canvas.classList.add('fade-in');
                 this.elements.resultContainer.appendChild(canvas);
                 this.updateStatus('Document normalized successfully.');
+                console.log(normalizeResult.items[0]);
+
+                if (walletManager.connected) {
+                    try {
+                        await walletManager.uploadToArweave(normalizeResult.items[0]);
+                        this.updateStatus('Document normalized and prepared for upload.');
+                    } catch (error) {
+                        console.error('Failed to prepare upload:', error);
+                        this.updateStatus('Document normalized. Upload preparation failed.');
+                    }
+                }
             }
 
             this.layer.clearDrawingItems();
-            this.elements.normalizeBtn.disabled = true;
         } catch (error) {
             this.updateStatus(`Normalization failed: ${error.message}`);
             console.error(error);
@@ -170,26 +218,35 @@ class DocumentScanner {
     }
 
     async restartDetecting() {
-        this.elements.editorContainer.style.display = 'none';
-        this.elements.resultContainer.innerHTML = '';
-        this.elements.cameraContainer.style.display = 'block';
+        this.hideElement(this.elements.editorContainer);
+        this.hideElement(this.elements.resultContainer);
+        this.hideElement(this.elements.restartBtn);
+        this.hideElement(this.elements.normalizeBtn);
         
-        this.elements.startBtn.style.display = 'inline';
-        this.elements.restartBtn.style.display = 'none';
-        this.elements.normalizeBtn.disabled = true;
-        
-        this.layer.clearDrawingItems();
-        await this.router.startCapturing("DetectDocumentBoundaries_Default");
-        
-        this.updateStatus('Scanner restarted. Point camera at a document.');
+        setTimeout(() => {
+            this.elements.resultContainer.innerHTML = '';
+            this.showElement(this.elements.cameraContainer);
+            this.showElement(this.elements.restartBtn);
+            
+            this.layer.clearDrawingItems();
+            this.router.startCapturing("DetectDocumentBoundaries_Default");
+            
+            this.updateStatus('Scanner restarted. Point camera at a document.');
+        }, 300);
     }
 
     updateStatus(message) {
-        this.elements.statusMessage.textContent = message;
+        if (message) {
+            this.elements.statusMessage.textContent = message;
+            this.showElement(this.elements.statusMessage);
+        } else {
+            this.hideElement(this.elements.statusMessage);
+        }
     }
 }
 
 // Initialize the scanner when the page loads
 window.addEventListener('DOMContentLoaded', () => {
+    walletManager = new WalletManager();
     new DocumentScanner();
 }); 
