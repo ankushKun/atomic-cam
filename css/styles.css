@@ -31,16 +31,16 @@ h1 {
 }
 
 .btn {
-    padding: 12px 28px;
-    font-size: 1rem;
+    padding: 12px;
+    font-size: 1.1rem;
     font-weight: 500;
     cursor: pointer;
-    background-color: #2563eb;
+    background-color: #323232;
     color: white;
     border: none;
     border-radius: 12px;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn:disabled {
@@ -51,9 +51,8 @@ h1 {
 }
 
 .btn:hover:not(:disabled) {
-    background-color: #1d4ed8;
+    background-color: #323232;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .viewer-container {
