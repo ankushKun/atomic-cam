@@ -138,13 +138,31 @@ class WalletManager {
         }
     }
 
-    async mintAsset(data) {
-        if (!this.connected) {
-            throw new Error('Wallet not connected');
-        }
+    async mintAsset(imageFile, metadata) {
+        try {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            formData.append('location', metadata.location);
+            formData.append('walletAddress', this.address);
+            formData.append('name', metadata.name);
 
-        // Implementation for uploading to Arweave will go here
-        // This is a placeholder for now
-        console.log('Minting asset:', data);
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Upload failed');
+            }
+
+            const result = await response.json();
+            console.log('Asset minted successfully:', result);
+            return result;
+
+        } catch (error) {
+            console.error('Error minting asset:', error);
+            throw error;
+        }
     }
 } 

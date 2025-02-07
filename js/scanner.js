@@ -283,7 +283,10 @@ class DocumentScanner {
                                 toCanvas: () => scaledCanvas,
                                 dataUrl: imageData.dataUrl
                             };
-                            await walletManager.mintAsset(optimizedImageData);
+                            await walletManager.mintAsset(optimizedImageData, {
+                                location: "CHD",
+                                name: "Ankush"
+                            });
                             this.updateStatus('Document prepared for minting.');
                         } catch (error) {
                             console.error('Failed to prepare for minting:', error);
