@@ -138,13 +138,13 @@ class WalletManager {
         }
     }
 
-    async uploadToArweave(data) {
+    async mintAsset(data) {
         if (!this.connected) {
             throw new Error('Wallet not connected');
         }
 
         // Implementation for uploading to Arweave will go here
         // This is a placeholder for now
-        console.log('Uploading to Arweave:', data);
+        console.log('Minting asset:', data);
     }
 } 

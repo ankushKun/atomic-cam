@@ -239,12 +239,16 @@ class DocumentScanner {
                 scaledCanvas.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
                 scaledCanvas.classList.add('fade-in');
                 
-                // Create container for canvas and download button
+                // Create container for canvas and buttons
                 const resultWrapper = document.createElement('div');
                 resultWrapper.className = 'result-wrapper';
                 
                 // Add canvas to wrapper
                 resultWrapper.appendChild(scaledCanvas);
+                
+                // Create buttons container
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'result-buttons';
                 
                 // Create download button
                 const downloadBtn = document.createElement('button');
@@ -264,27 +268,36 @@ class DocumentScanner {
                     }
                 };
                 
-                resultWrapper.appendChild(downloadBtn);
+                buttonsContainer.appendChild(downloadBtn);
+
+                // Add mint button if wallet is connected
+                if (walletManager.connected) {
+                    const mintBtn = document.createElement('button');
+                    mintBtn.className = 'btn btn-mint';
+                    mintBtn.innerHTML = '<span>🖼️ Mint NFT</span>';
+                    mintBtn.onclick = async () => {
+                        try {
+                            // Pass the optimized image data
+                            const optimizedImageData = {
+                                ...normalizeResult.items[0],
+                                toCanvas: () => scaledCanvas,
+                                dataUrl: imageData.dataUrl
+                            };
+                            await walletManager.mintAsset(optimizedImageData);
+                            this.updateStatus('Document prepared for minting.');
+                        } catch (error) {
+                            console.error('Failed to prepare for minting:', error);
+                            this.updateStatus('Failed to prepare for minting.');
+                        }
+                    };
+                    buttonsContainer.appendChild(mintBtn);
+                }
+                
+                resultWrapper.appendChild(buttonsContainer);
                 this.elements.resultContainer.appendChild(resultWrapper);
                 
                 this.updateStatus('Document normalized successfully.');
                 console.log(normalizeResult.items[0]);
-
-                if (walletManager.connected) {
-                    try {
-                        // Pass the optimized image data
-                        const optimizedImageData = {
-                            ...normalizeResult.items[0],
-                            toCanvas: () => scaledCanvas,
-                            dataUrl: imageData.dataUrl
-                        };
-                        await walletManager.uploadToArweave(optimizedImageData);
-                        this.updateStatus('Document normalized and prepared for upload.');
-                    } catch (error) {
-                        console.error('Failed to prepare upload:', error);
-                        this.updateStatus('Document normalized. Upload preparation failed.');
-                    }
-                }
             }
 
             this.layer.clearDrawingItems();

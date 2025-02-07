@@ -282,8 +282,8 @@ body.dialog-open {
 .result-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px;
     align-items: center;
+    width: 100%;
 }
 
 .btn-download {
@@ -309,4 +309,22 @@ body.dialog-open {
     max-width: 100%;
     height: auto;
     margin-bottom: 16px;
+}
+
+.result-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.btn-mint {
+    background-color: #2a2a2a;
+    border: 1px solid #333333;
+    padding: 12px 24px;
+}
+
+.btn-mint:hover:not(:disabled) {
+    background-color: #333333;
+    border-color: #444444;
 } 
