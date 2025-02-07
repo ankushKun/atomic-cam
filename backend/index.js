@@ -2,11 +2,14 @@ import express, { json } from 'express';
 import Arweave from 'arweave';
 import { readFileSync } from 'fs';
 import cors from 'cors';
+import { assetSrc, getProfileByWalletAddress } from './helpers/index.js';
+import { message, spawn } from '@permaweb/aoconnect';
+import { createDataItemSigner } from '@permaweb/aoconnect/node';
+import { AO } from './constants.js';
+import multer, { memoryStorage } from 'multer';
+
 const app = express();
 const port = process.env.PORT || 3000;
-
-import { getProfileByWalletAddress } from './helpers/index.js';
-
 // Development-only CORS configuration
 app.use(cors());
 
@@ -27,12 +30,12 @@ try {
   console.error('Error loading wallet:', error);
   process.exit(1);
 }
+const signer = createDataItemSigner(wallet);
 
 // Middleware for parsing JSON bodies
 app.use(json());
 
 // Middleware for handling file uploads
-import multer, { memoryStorage } from 'multer';
 const upload = multer({
   storage: memoryStorage(),
   limits: {
@@ -57,13 +60,13 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
+    console.log("Fetching profile")
     const profile = await getProfileByWalletAddress({
       address: req.body.walletAddress
     });
-    if (!profile) {
+    if (!profile.id) {
       return res.status(400).json({ error: 'Profile not found' });
     }
-    console.log(profile);
 
     // Create metadata object
     const metadata = {
@@ -81,33 +84,53 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       ...metadata
     });
 
-    res.status(200).json({
-      message: 'Upload received successfully',
-      metadata
-    });
+    console.log("Spawning process")
+    const assetProcess = await spawn({
+      module: AO.module,
+      scheduler: AO.scheduler,
+      signer: signer,
+      tags: [
+        { name: "App-Name", value: "Atomic-Cam" },
+        { name: "Implements", value: "ANS-110" },
+        { name: "Content-Type", value: "image/jpeg" },
+        { name: "Title", value: "SAMPLE" },
+        { name: "Description", value: "SAMPLE" },
+        { name: "Tags", value: "SAMPLE" },
+        { name: "Creator", value: metadata.profileId },
+        { name: "Location", value: metadata.location },
+        { name: "Name", value: metadata.name }
+      ],
+      data: req.file.buffer
+    })
+    console.log(assetProcess);
 
-    // Upload image to Arweave
-    // const imageTransaction = await arweave.createTransaction({
-    //   data: req.file.buffer
-    // }, wallet);
+    // delay 3s
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
-    // imageTransaction.addTag('Content-Type', req.file.mimetype);
-    // await arweave.transactions.sign(imageTransaction, wallet);
+    console.log("Adding code")
+    while (true) {
+      try {
+        const msg = await message({
+          process: assetProcess,
+          signer: signer,
+          tags: [{ name: "Action", value: "Eval" }],
+          data: assetSrc.replaceAll("<NAME>", "SAMPLE").replaceAll("<TICKER>", "ATOMIC ASSET").replaceAll("<DENOMINATION>", "1").replaceAll("<BALANCE>", "1").replaceAll("<OWNER>", metadata.profileId)
+        })
+        console.log(msg)
 
-    // // Post the image transaction
-    // const imageUploadResponse = await arweave.transactions.post(imageTransaction);
-
-    // if (imageUploadResponse.status !== 200) {
-    //   throw new Error('Failed to upload image to Arweave');
-    // }
-
-    // console.log('Image uploaded successfully:', imageTransaction.id);
-    // metadata.id = imageTransaction.id;
-
-    // res.status(200).json({
-    //   message: 'Upload received successfully',
-    //   metadata
-    // });
+        res.status(200).json({
+          message: 'Upload received successfully',
+          ...metadata,
+          id: msg.id
+        });
+        break;
+      } catch (error) {
+        console.log(error)
+        console.log("Retrying...")
+      } finally {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
 
   } catch (error) {
     console.error('Upload error:', error);
