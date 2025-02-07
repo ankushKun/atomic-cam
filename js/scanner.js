@@ -277,17 +277,23 @@ class DocumentScanner {
                     mintBtn.innerHTML = '<span>🖼️ Mint NFT</span>';
                     mintBtn.onclick = async () => {
                         try {
-                            // Pass the optimized image data
-                            const optimizedImageData = {
-                                ...normalizeResult.items[0],
-                                toCanvas: () => scaledCanvas,
-                                dataUrl: imageData.dataUrl
-                            };
-                            await walletManager.mintAsset(optimizedImageData, {
-                                location: "CHD",
-                                name: "Ankush"
-                            });
-                            this.updateStatus('Document prepared for minting.');
+                            // Convert the canvas to a Blob
+                            const canvas = scaledCanvas;
+                            canvas.toBlob(async (blob) => {
+                                try {
+                                    // Create a File object from the Blob
+                                    const imageFile = new File([blob], 'document.jpg', { type: 'image/jpeg' });
+                                    
+                                    await walletManager.mintAsset(imageFile, {
+                                        location: "CHD",
+                                        name: "Ankush"
+                                    });
+                                    this.updateStatus('Document minted successfully.');
+                                } catch (error) {
+                                    console.error('Failed to mint:', error);
+                                    this.updateStatus('Failed to mint document.');
+                                }
+                            }, 'image/jpeg');
                         } catch (error) {
                             console.error('Failed to prepare for minting:', error);
                             this.updateStatus('Failed to prepare for minting.');

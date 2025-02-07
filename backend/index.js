@@ -1,9 +1,14 @@
-const express = require('express');
-const Arweave = require('arweave');
-const fs = require('fs');
-const path = require('path');
+import express, { json } from 'express';
+import Arweave from 'arweave';
+import { readFileSync } from 'fs';
+import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 3000;
+
+import { getProfileByWalletAddress } from './helpers/index.js';
+
+// Development-only CORS configuration
+app.use(cors());
 
 // Initialize Arweave
 const arweave = Arweave.init({
@@ -15,7 +20,7 @@ const arweave = Arweave.init({
 // Load wallet
 let wallet;
 try {
-  const walletFile = fs.readFileSync(path.join(__dirname, 'wallet.json'));
+  const walletFile = readFileSync('./wallet.json');
   wallet = JSON.parse(walletFile);
   console.log('Arweave wallet loaded successfully');
 } catch (error) {
@@ -24,12 +29,12 @@ try {
 }
 
 // Middleware for parsing JSON bodies
-app.use(express.json());
+app.use(json());
 
 // Middleware for handling file uploads
-const multer = require('multer');
+import multer, { memoryStorage } from 'multer';
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: memoryStorage(),
   limits: {
     fileSize: 1 * 1024 * 1024, // 1MB limit
   }
@@ -48,14 +53,23 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     if (!req.body.walletAddress) {
       return res.status(400).json({ error: 'Wallet address is required' });
     }
-    if (!req.body.name){
-        return res.status(400).json({ error: 'Name is required' });
+    if (!req.body.name) {
+      return res.status(400).json({ error: 'Name is required' });
     }
+
+    const profile = await getProfileByWalletAddress({
+      address: req.body.walletAddress
+    });
+    if (!profile) {
+      return res.status(400).json({ error: 'Profile not found' });
+    }
+    console.log(profile);
 
     // Create metadata object
     const metadata = {
       location: req.body.location,
       walletAddress: req.body.walletAddress,
+      profileId: profile.id,
       name: req.body.name,
       timestamp: new Date().toISOString(),
       contentType: req.file.mimetype
@@ -67,28 +81,33 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       ...metadata
     });
 
-    // Upload image to Arweave
-    const imageTransaction = await arweave.createTransaction({
-        data: req.file.buffer
-      }, wallet);
-  
-      imageTransaction.addTag('Content-Type', req.file.mimetype);
-      await arweave.transactions.sign(imageTransaction, wallet);
-      
-      // Post the image transaction
-      const imageUploadResponse = await arweave.transactions.post(imageTransaction);
-      
-      if (imageUploadResponse.status !== 200) {
-        throw new Error('Failed to upload image to Arweave');
-      }
-
-      console.log('Image uploaded successfully:', imageTransaction.id);
-      metadata.id = imageTransaction.id;
-
     res.status(200).json({
       message: 'Upload received successfully',
       metadata
     });
+
+    // Upload image to Arweave
+    // const imageTransaction = await arweave.createTransaction({
+    //   data: req.file.buffer
+    // }, wallet);
+
+    // imageTransaction.addTag('Content-Type', req.file.mimetype);
+    // await arweave.transactions.sign(imageTransaction, wallet);
+
+    // // Post the image transaction
+    // const imageUploadResponse = await arweave.transactions.post(imageTransaction);
+
+    // if (imageUploadResponse.status !== 200) {
+    //   throw new Error('Failed to upload image to Arweave');
+    // }
+
+    // console.log('Image uploaded successfully:', imageTransaction.id);
+    // metadata.id = imageTransaction.id;
+
+    // res.status(200).json({
+    //   message: 'Upload received successfully',
+    //   metadata
+    // });
 
   } catch (error) {
     console.error('Upload error:', error);

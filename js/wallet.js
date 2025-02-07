@@ -146,7 +146,7 @@ class WalletManager {
             formData.append('walletAddress', this.address);
             formData.append('name', metadata.name);
 
-            const response = await fetch('/api/upload', {
+            const response = await fetch('http://localhost:3000/api/upload', {
                 method: 'POST',
                 body: formData
             });
