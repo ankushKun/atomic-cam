@@ -189,19 +189,62 @@ class DocumentScanner {
             const normalizeResult = await this.router.capture(this.originalImageData, "NormalizeDocument_Default");
             
             if (normalizeResult.items[0]) {
-                const canvas = normalizeResult.items[0].toCanvas();
-                canvas.style.maxWidth = '100%';
-                canvas.style.height = 'auto';
-                canvas.style.borderRadius = '8px';
-                canvas.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-                canvas.classList.add('fade-in');
+                // Create initial canvas from normalized result
+                const originalCanvas = normalizeResult.items[0].toCanvas();
+                
+                // Create a new canvas with 1024x1024 dimensions
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = 1024;
+                scaledCanvas.height = 1024;
+                
+                // Get the 2D context
+                const ctx = scaledCanvas.getContext('2d');
+                
+                // Enable image smoothing for better quality
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                // Calculate scaling to maintain aspect ratio
+                const scale = Math.min(1024 / originalCanvas.width, 1024 / originalCanvas.height);
+                const scaledWidth = originalCanvas.width * scale;
+                const scaledHeight = originalCanvas.height * scale;
+                
+                // Calculate centering offsets
+                const offsetX = (1024 - scaledWidth) / 2;
+                const offsetY = (1024 - scaledHeight) / 2;
+                
+                // Fill background with white instead of black
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, 1024, 1024);
+                
+                // Draw the scaled image centered
+                ctx.drawImage(
+                    originalCanvas,
+                    0, 0, originalCanvas.width, originalCanvas.height,
+                    offsetX, offsetY, scaledWidth, scaledHeight
+                );
+
+                // Get JPEG data with optimal quality (0.92 is a good balance)
+                const imageData = {
+                    dataUrl: scaledCanvas.toDataURL('image/jpeg', 0.92),
+                    get size() {
+                        return (this.dataUrl.length * 3) / 4 / 1024 / 1024;
+                    }
+                };
+
+                // Style the canvas for display
+                scaledCanvas.style.maxWidth = '100%';
+                scaledCanvas.style.height = 'auto';
+                scaledCanvas.style.borderRadius = '8px';
+                scaledCanvas.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                scaledCanvas.classList.add('fade-in');
                 
                 // Create container for canvas and download button
                 const resultWrapper = document.createElement('div');
                 resultWrapper.className = 'result-wrapper';
                 
                 // Add canvas to wrapper
-                resultWrapper.appendChild(canvas);
+                resultWrapper.appendChild(scaledCanvas);
                 
                 // Create download button
                 const downloadBtn = document.createElement('button');
@@ -209,15 +252,14 @@ class DocumentScanner {
                 downloadBtn.innerHTML = '<span>💾 Save Image</span>';
                 downloadBtn.onclick = () => {
                     try {
-                        const dataUrl = canvas.toDataURL('image/png');
                         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                         const link = document.createElement('a');
-                        link.href = dataUrl;
-                        link.download = `document-${timestamp}.png`;
+                        link.href = imageData.dataUrl;
+                        link.download = `document-${timestamp}.jpg`;
                         link.click();
-                        this.updateStatus('Document saved successfully.');
+                        this.updateStatus(`Document saved successfully (${imageData.size.toFixed(2)}MB)`);
                     } catch (error) {
-                        console.error('Failed to save PNG:', error);
+                        console.error('Failed to save image:', error);
                         this.updateStatus('Failed to save document.');
                     }
                 };
@@ -230,7 +272,13 @@ class DocumentScanner {
 
                 if (walletManager.connected) {
                     try {
-                        await walletManager.uploadToArweave(normalizeResult.items[0]);
+                        // Pass the optimized image data
+                        const optimizedImageData = {
+                            ...normalizeResult.items[0],
+                            toCanvas: () => scaledCanvas,
+                            dataUrl: imageData.dataUrl
+                        };
+                        await walletManager.uploadToArweave(optimizedImageData);
                         this.updateStatus('Document normalized and prepared for upload.');
                     } catch (error) {
                         console.error('Failed to prepare upload:', error);
