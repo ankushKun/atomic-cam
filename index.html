@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Scanner</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Dynamsoft Document Normalizer SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.js"></script>
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/scanner.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Document Scanner</h1>
+        
+        <div class="controls">
+            <button id="start-detecting" class="btn" style="display: none">Start Scanning</button>
+            <button id="restart-detecting" class="btn" style="display: none">Restart</button>
+            <button id="normalize-with-confirmed-quad" class="btn" disabled>Normalize</button>
+        </div>
+
+        <div class="viewer-container">
+            <div id="camera-container"></div>
+            <div id="editor-container"></div>
+            <div id="result-container"></div>
+        </div>
+
+        <div id="status-message"></div>
+    </div>
+</body>
+</html> 

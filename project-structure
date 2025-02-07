@@ -1,0 +1,8 @@
+document-scanner/
+├── index.html
+├── css/
+│   └── styles.css
+├── js/
+│   ├── config.js
+│   └── scanner.js
+└── README.md 
