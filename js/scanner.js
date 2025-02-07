@@ -63,7 +63,7 @@ class DocumentScanner {
             this.showElement(this.elements.startBtn);
             this.showElement(this.elements.statusMessage);
             
-            this.updateStatus('Scanner ready. Click Start Scanning to begin.');
+            this.updateStatus('Scanner ready. Point camera at a document and hold still.');
         } catch (error) {
             this.updateStatus(`Initialization failed: ${error.message}`);
             console.error(error);
@@ -195,7 +195,36 @@ class DocumentScanner {
                 canvas.style.borderRadius = '8px';
                 canvas.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
                 canvas.classList.add('fade-in');
-                this.elements.resultContainer.appendChild(canvas);
+                
+                // Create container for canvas and download button
+                const resultWrapper = document.createElement('div');
+                resultWrapper.className = 'result-wrapper';
+                
+                // Add canvas to wrapper
+                resultWrapper.appendChild(canvas);
+                
+                // Create download button
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn btn-download';
+                downloadBtn.innerHTML = '<span>💾 Save Image</span>';
+                downloadBtn.onclick = () => {
+                    try {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                        const link = document.createElement('a');
+                        link.href = dataUrl;
+                        link.download = `document-${timestamp}.png`;
+                        link.click();
+                        this.updateStatus('Document saved successfully.');
+                    } catch (error) {
+                        console.error('Failed to save PNG:', error);
+                        this.updateStatus('Failed to save document.');
+                    }
+                };
+                
+                resultWrapper.appendChild(downloadBtn);
+                this.elements.resultContainer.appendChild(resultWrapper);
+                
                 this.updateStatus('Document normalized successfully.');
                 console.log(normalizeResult.items[0]);
 
@@ -231,7 +260,7 @@ class DocumentScanner {
             this.layer.clearDrawingItems();
             this.router.startCapturing("DetectDocumentBoundaries_Default");
             
-            this.updateStatus('Scanner restarted. Point camera at a document.');
+            this.updateStatus('Scanner restarted. Point camera at a document and hold still.');
         }, 300);
     }
 
