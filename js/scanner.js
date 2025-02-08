@@ -357,25 +357,22 @@ class DocumentScanner {
                                             console.log("res", res)
                                             console.log("res.id", res.id)
                                             // eg. https://bazar.arweave.net/#/asset/hVnCLajwU9XJ4ENTdA7KUl0JTJrmrsaEHMbgfl66h10
-                                            window.open(`https://bazar.arweave.net/#/asset/${res.id}`, '_blank');
+                                            // Create a fixed position button in the center of the screen
                                             const viewButton = document.createElement('a');
+                                            viewButton.innerHTML = 'View on Bazar';
+                                            viewButton.style.position = 'fixed';
+                                            viewButton.style.top = '50%';
+                                            viewButton.style.left = '50%';
+                                            viewButton.style.transform = 'translate(-50%, -50%)';
+                                            viewButton.style.padding = '10px 20px';
+                                            viewButton.style.zIndex = '9999';
+                                            viewButton.style.cursor = 'pointer';
                                             viewButton.href = `https://bazar.arweave.net/#/asset/${res.id}`;
                                             viewButton.target = '_blank';
-                                            viewButton.className = 'button';
-                                            viewButton.style.display = 'block';
-                                            viewButton.style.margin = '20px auto';
-                                            viewButton.style.padding = '12px 24px';
-                                            viewButton.style.backgroundColor = '#4CAF50';
-                                            viewButton.style.color = 'white';
-                                            viewButton.style.border = 'none';
-                                            viewButton.style.borderRadius = '4px';
-                                            viewButton.style.textDecoration = 'none';
-                                            viewButton.style.textAlign = 'center';
-                                            viewButton.style.fontSize = '16px';
-                                            viewButton.style.cursor = 'pointer';
-                                            viewButton.textContent = 'View on Bazar';
-                                            viewButton.style.width = 'fit-content';
-                                            resultWrapper.appendChild(viewButton);
+                                            document.body.appendChild(viewButton);
+
+                                            // Also open in new tab immediately
+                                            window.open(`https://bazar.arweave.net/#/asset/${res.id}`, '_blank');
                                             this.updateStatus('Document minted successfully.');
                                         } catch (error) {
                                             console.error('Failed to mint:', error);
