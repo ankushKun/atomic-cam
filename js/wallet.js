@@ -2,7 +2,7 @@ class WalletManager {
     constructor() {
         this.address = null;
         this.connected = false;
-        
+
         this.connectButton = document.getElementById('wallet-connect');
         this.setupEventListeners();
         this.checkConnection();
@@ -11,7 +11,7 @@ class WalletManager {
 
     setupEventListeners() {
         this.connectButton.addEventListener('click', () => this.toggleConnection());
-        
+
         // Listen for ArConnect events
         window.addEventListener('arweaveWalletLoaded', () => {
             this.checkConnection();
@@ -26,19 +26,19 @@ class WalletManager {
     async checkConnection() {
         try {
             const permissions = ['ACCESS_ADDRESS', 'SIGN_TRANSACTION'];
-            
+
             if (window.arweaveWallet) {
                 this.connected = await window.arweaveWallet.getPermissions()
                     .then(perms => permissions.every(p => perms.includes(p)))
                     .catch(() => false);
-                
+
                 if (this.connected) {
                     this.address = await window.arweaveWallet.getActiveAddress();
                 }
             } else {
                 this.connected = false;
             }
-            
+
             this.updateButtonState();
         } catch (error) {
             console.error('Wallet connection check failed:', error);
@@ -114,7 +114,7 @@ class WalletManager {
                     'ACCESS_ADDRESS',
                     'SIGN_TRANSACTION'
                 ]);
-                
+
                 this.address = await window.arweaveWallet.getActiveAddress();
                 this.connected = true;
                 this.updateButtonState();
@@ -158,6 +158,7 @@ class WalletManager {
 
             const result = await response.json();
             console.log('Asset minted successfully:', result);
+            console.log("result", result.id)
             return result;
 
         } catch (error) {
