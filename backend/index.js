@@ -9,7 +9,7 @@ import { AO } from './constants.js';
 import multer, { memoryStorage } from 'multer';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 // Development-only CORS configuration
 app.use(cors());
 
