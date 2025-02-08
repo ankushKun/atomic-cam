@@ -98,7 +98,9 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         { name: "Tags", value: "SAMPLE" },
         { name: "Creator", value: metadata.profileId },
         { name: "Location", value: metadata.location },
-        { name: "Name", value: metadata.name }
+        { name: "Minter-Name", value: metadata.name },
+        { name: "Name", value: metadata.name },
+
       ],
       data: req.file.buffer
     })
@@ -131,7 +133,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
           res.status(200).json({
             message: 'Upload received successfully',
             ...metadata,
-            id: msg.id
+            id: assetProcess
           });
           break;
         } catch (error) {
