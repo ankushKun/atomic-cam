@@ -162,6 +162,7 @@ class WalletManager {
             console.log("result", result.id)
             return result;
 
+
         } catch (error) {
             console.error('Error minting asset:', error);
             throw error;
