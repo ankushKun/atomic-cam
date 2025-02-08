@@ -9,4 +9,7 @@ export const AO = {
   collectionSrc: '2ZDuM2VUCN8WHoAKOOjiH4_7Apq0ZHKnTWdLppxCdGY',
   profileRegistry: 'SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY',
   profileSrc: '_R2XYWDPUXVvQrQKFaQRvDTDcDwnQNbqlTd_qvCRSpQ',
+
+  collection: "PdirSmCU97k6HmyjZwLuytJrqYd241zdqmLuLPH1lnA",
+  arindiaProfile: "auJlN8sZUFTi4YhN_z4wzsw9VZKjLnFaMQ0ymfbUYGU",
 }

@@ -102,7 +102,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       ],
       data: req.file.buffer
     })
-    console.log(assetProcess);
+    console.log("assetProcess", assetProcess);
 
     // delay 3s
     await new Promise(resolve => setTimeout(resolve, 3000));
@@ -116,14 +116,28 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
           tags: [{ name: "Action", value: "Eval" }],
           data: assetSrc.replaceAll("<NAME>", "SAMPLE").replaceAll("<TICKER>", "ATOMIC ASSET").replaceAll("<DENOMINATION>", "1").replaceAll("<BALANCE>", "1").replaceAll("<OWNER>", metadata.profileId)
         })
-        console.log(msg)
+        // console.log(msg)
 
-        res.status(200).json({
-          message: 'Upload received successfully',
-          ...metadata,
-          id: msg.id
-        });
-        break;
+        //add asset to collection
+        try {
+          const updateCollectionMsg = await message({
+            process: AO.collection,
+            signer: signer,
+            tags: [{ name: "Action", value: "Update-Assets" }],
+            // data: `{AssetIds={"${assetProcess}"}, UpdateType="Add"}`
+            data: JSON.stringify({ AssetIds: [assetProcess], UpdateType: "Add" })
+          })
+          console.log("updateCollectionMsg", updateCollectionMsg)
+          res.status(200).json({
+            message: 'Upload received successfully',
+            ...metadata,
+            id: msg.id
+          });
+          break;
+        } catch (error) {
+          console.log(error)
+          res.status(500).json({ error: 'Internal server error', details: error.message });
+        }
       } catch (error) {
         console.log(error)
         console.log("Retrying...")
