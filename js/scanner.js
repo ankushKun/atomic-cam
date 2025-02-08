@@ -313,6 +313,7 @@ class DocumentScanner {
                                         try {
                                             const imageFile = new File([blob], 'document.jpg', { type: 'image/jpeg' });
                                             const path = window.location.pathname;
+                                            console.log("path", path)
                                             let location;
 
                                             // switch (path) {
