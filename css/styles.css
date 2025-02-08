@@ -204,11 +204,12 @@ body {
 
 .result-buttons {
     position: fixed;
-    bottom: 10px;
+    bottom: 50px;
     left: 0;
     right: 0;
     display: flex;
     justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
     gap: 12px;
     padding: 0 24px;
     z-index: 9999;
