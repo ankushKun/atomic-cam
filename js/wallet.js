@@ -146,7 +146,8 @@ class WalletManager {
             formData.append('walletAddress', this.address);
             formData.append('name', metadata.name);
 
-            const response = await fetch('https://api.betteridea.dev/api/upload', {
+            // const response = await fetch('https://api.betteridea.dev/api/upload', {
+            const response = await fetch('http://localhost:3001/api/upload', {
                 method: 'POST',
                 body: formData
             });

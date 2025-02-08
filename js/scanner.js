@@ -360,6 +360,9 @@ class DocumentScanner {
                                             // Create a fixed position button in the center of the screen
                                             const viewButton = document.createElement('a');
                                             viewButton.innerHTML = 'View on Bazar';
+                                            viewButton.style.backgroundColor = 'black';
+                                            viewButton.style.color = 'white';
+                                            viewButton.style.borderRadius = '5px';
                                             viewButton.style.position = 'fixed';
                                             viewButton.style.top = '50%';
                                             viewButton.style.left = '50%';
