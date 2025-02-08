@@ -358,6 +358,24 @@ class DocumentScanner {
                                             console.log("res.id", res.id)
                                             // eg. https://bazar.arweave.net/#/asset/hVnCLajwU9XJ4ENTdA7KUl0JTJrmrsaEHMbgfl66h10
                                             window.open(`https://bazar.arweave.net/#/asset/${res.id}`, '_blank');
+                                            const viewButton = document.createElement('a');
+                                            viewButton.href = `https://bazar.arweave.net/#/asset/${res.id}`;
+                                            viewButton.target = '_blank';
+                                            viewButton.className = 'button';
+                                            viewButton.style.display = 'block';
+                                            viewButton.style.margin = '20px auto';
+                                            viewButton.style.padding = '12px 24px';
+                                            viewButton.style.backgroundColor = '#4CAF50';
+                                            viewButton.style.color = 'white';
+                                            viewButton.style.border = 'none';
+                                            viewButton.style.borderRadius = '4px';
+                                            viewButton.style.textDecoration = 'none';
+                                            viewButton.style.textAlign = 'center';
+                                            viewButton.style.fontSize = '16px';
+                                            viewButton.style.cursor = 'pointer';
+                                            viewButton.textContent = 'View on Bazar';
+                                            viewButton.style.width = 'fit-content';
+                                            resultWrapper.appendChild(viewButton);
                                             this.updateStatus('Document minted successfully.');
                                         } catch (error) {
                                             console.error('Failed to mint:', error);
