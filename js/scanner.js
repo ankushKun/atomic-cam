@@ -315,21 +315,33 @@ class DocumentScanner {
                                             const path = window.location.pathname;
                                             let location;
 
-                                            switch (path) {
-                                                case '/CHD': case '/CHD.html':
-                                                    location = 'CHD';
-                                                    break;
-                                                case '/BDQ': case '/BDQ.html':
-                                                    location = 'BDQ';
-                                                    break;
-                                                case '/BLR': case '/BLR.html':
-                                                    location = 'BLR';
-                                                    break;
-                                                case '/DEL': case '/DEL.html':
-                                                    location = 'DEL';
-                                                    break;
-                                                default:
-                                                    location = 'Unknown';
+                                            // switch (path) {
+                                            //     case '/CHD': case '/CHD.html': case '/atomic-cam/CHD'
+                                            //         location = 'CHD';
+                                            //         break;
+                                            //     case '/BDQ': case '/BDQ.html':
+                                            //         location = 'BDQ';
+                                            //         break;
+                                            //     case '/BLR': case '/BLR.html':
+                                            //         location = 'BLR';
+                                            //         break;
+                                            //     case '/DEL': case '/DEL.html':
+                                            //         location = 'DEL';
+                                            //         break;
+                                            //     default:
+                                            //         location = 'Unknown';
+                                            // }
+
+                                            if (path.includes("CHD")) {
+                                                location = 'CHD'
+                                            } else if (path.includes("BDQ")) {
+                                                location = 'BDQ'
+                                            } else if (path.includes("BLR")) {
+                                                location = 'BLR'
+                                            } else if (path.includes("DEL")) {
+                                                location = 'DEL'
+                                            } else {
+                                                location = 'Unknown'
                                             }
 
                                             if (location === "Unknown") {
