@@ -341,6 +341,8 @@ class DocumentScanner {
                                                 location = 'BLR'
                                             } else if (path.includes("DEL")) {
                                                 location = 'DEL'
+                                            }  else if (path.includes("MUM")) {
+                                                location = 'MUM'
                                             } else {
                                                 location = 'Unknown'
                                             }
