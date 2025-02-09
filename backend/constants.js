@@ -10,6 +10,6 @@ export const AO = {
   profileRegistry: 'SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY',
   profileSrc: '_R2XYWDPUXVvQrQKFaQRvDTDcDwnQNbqlTd_qvCRSpQ',
 
-  collection: "PdirSmCU97k6HmyjZwLuytJrqYd241zdqmLuLPH1lnA",
+  collection: "PxzVQgaVXhtwiM7J6Eljk-D8g1WKp9f8Ke4PjgAA10mc",
   arindiaProfile: "auJlN8sZUFTi4YhN_z4wzsw9VZKjLnFaMQ0ymfbUYGU",
 }

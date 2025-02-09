@@ -3,10 +3,10 @@ import { spawn, message, createDataItemSigner } from "@permaweb/aoconnect"
 import { AO } from "../constants.js"
 import Arweave from "arweave"
 
-const title = "My Collection"
-const description = "My Collection Description"
-const thumbnail = "GmvxbZgH7PC70Pz1z_2C6CSR8BFakIJBHXXdD4f7lts"
-const banner = "m18Z0R_93wMXagkftgYJNNEy-E0bjylED0mjZwPnnEE"
+const title = "The Buffers"
+const description = "Buffers are a group of agents born out of data stored on Arweave"
+const thumbnail = "lp51N4FWXSHvwQQ-Qz3m7Ybj0t75Tq2Y7MDtb5xnfAI"
+const banner = "Fr6Z9vYSXG8YsN-Rn1BpNCqGK_QDJhqFUvglZ-N12Zg"
 const dateCreated = `${new Date().getTime()}`
 const dateUpdated = `${new Date().getTime()}`
 
