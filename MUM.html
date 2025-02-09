@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic Cam</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Dynamsoft Document Normalizer SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.js"></script>
+    <!-- ArConnect SDK -->
+    <script src="https://unpkg.com/arconnect"></script>
+    <!-- App Scripts -->
+    <script src="js/wallet.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/scanner.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <button id="wallet-connect" class="btn btn-wallet">
+                <span>Connect Wallet</span>
+            </button>
+            <button id="restart-detecting" class="btn btn-circle hidden">
+                <span>🔄</span>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <div class="camera-view">
+                <div id="camera-container" class="hidden"></div>
+                <div id="editor-container" class="hidden"></div>
+                <div id="result-container" class="hidden"></div>
+                
+                <div class="camera-overlay">
+                    <div class="scan-area">
+                        <!-- <div class="scan-line"></div> -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-wrapper">
+                <div class="controls">
+                    <button id="start-detecting" class="btn btn-primary btn-large">
+                        <span>Start Scanning</span>
+                    </button>
+                    <button id="normalize-with-confirmed-quad" class="btn btn-primary hidden">
+                        <span>Next</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <div id="status-message" class="status-message hidden"></div>
+    </div>
+
+    <!-- Add this right before the closing body tag -->
+    <div id="name-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Enter Your Name</h2>
+            <input type="text" id="user-name" placeholder="Your name">
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancel-mint">Cancel</button>
+                <button class="btn btn-primary" id="confirm-mint">Confirm</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
